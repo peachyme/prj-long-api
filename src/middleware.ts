@@ -75,7 +75,6 @@ export const isDemandeur = async (request: Request, response: Response, next: Ne
 export const isEmailVerified = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const emailVerified = request.user?.emailVerified;
-    console.log(emailVerified);
     
     if (!emailVerified) {
       return response.status(403).json('Forbidden: Please verify your email');

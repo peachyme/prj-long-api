@@ -1,6 +1,6 @@
 import express from "express";
 import type { Response, Request } from "express";
-import { body, validationResult } from "express-validator";
+import { body, query, validationResult } from "express-validator";
 
 import * as OffreurController from "../controllers/offreur.controller";
 import * as SkillController from "../controllers/skill.controller";
@@ -13,6 +13,18 @@ OffreurRouter.get("/", isAuthenticated, isEmailVerified, async (request: Request
     try {
         const Offreurs = await OffreurController.listOffreurs()
         return response.status(200).json(Offreurs);
+    } catch (error: any) {
+        return response.status(500).json(error.message);
+    }
+});
+
+// GET: Search Offreurs
+// Query parameters: fname, lname, skills, address, city, zip, country
+OffreurRouter.get("/search", isAuthenticated, isEmailVerified, async (request: Request, response: Response) => {
+    try {
+        const searchCriteria = request.query;
+        const searchResult = await OffreurController.searchOffreurs(searchCriteria);
+        return response.status(200).json(searchResult);
     } catch (error: any) {
         return response.status(500).json(error.message);
     }

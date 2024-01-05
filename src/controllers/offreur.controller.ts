@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { db } from "../utils/db.server";
 import { User } from "./user.controller";
 
@@ -28,7 +29,20 @@ type OffreurList = {
     fname: string;
     lname: string;
     apropos: string;
+    city: string;
+    zip: string;
+    country: string;
 };
+
+type SearchOffreurCriteria = {
+    fname?: string;
+    lname?: string;
+    skills?: string; // Assuming skills are searched by labels
+    address?: string;
+    city?: string;
+    zip?: string;
+    country?: string;
+  };
 
 // GET: List of Offreurs
 export const listOffreurs = async (): Promise<OffreurList[]> => {
@@ -38,6 +52,9 @@ export const listOffreurs = async (): Promise<OffreurList[]> => {
             fname: true,
             lname: true,
             apropos: true,
+            country: true,
+            city: true,
+            zip: true,
             skills: {
                 select: {
                     level: true,
@@ -54,6 +71,56 @@ export const listOffreurs = async (): Promise<OffreurList[]> => {
         },
     });
 };
+
+// GET : search offreurs
+export const searchOffreurs = async (criteria: SearchOffreurCriteria): Promise<OffreurList[]> => {
+    const { fname, lname, skills, address, city, zip, country } = criteria;
+
+    const skillsArray: string[] | undefined = skills ? skills.split(',') : undefined;
+    const whereClause: Prisma.OffreurWhereInput = {};
+  
+    if (fname) whereClause.fname = { contains: fname };
+    if (lname) whereClause.lname = { contains: lname };
+    if (skillsArray) {
+        whereClause.skills = {
+          some: {
+            skill: {
+              label: { in: skillsArray },
+            },
+          },
+        };
+      }  
+    if (address) whereClause.address = { contains: address };
+    if (city) whereClause.city = { contains: city };
+    if (zip) whereClause.zip = { contains: zip };
+    if (country) whereClause.country = { contains: country };
+  
+    return db.offreur.findMany({
+      where: whereClause,
+      select: {
+        id: true,
+        fname: true,
+        lname: true,
+        apropos: true,
+        country: true,
+        city: true,
+        zip: true,
+        skills: {
+            select: {
+                level: true,
+                skill: {
+                    select: {
+                        label: true,
+                    }
+                }
+            }
+        },
+        _count: {
+            select: { evaluations: true }
+        },
+      },
+    });
+  };
 
 // GET: show Offreur
 export const getOffreur = async (id: number): Promise<Offreur | null> => {
