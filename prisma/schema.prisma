@@ -42,11 +42,12 @@ model Demandeur {
   phone     String @unique
   email     String @unique
   address   String
-  counrty   String
+  country   String
   city      String
   zip       String
   demandes  Demande[]
   projets   Projet[]
+  evaluations   Evaluation[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -58,10 +59,11 @@ model Offreur {
   id            Int @id @default(autoincrement())
   fname         String
   lname         String
+  apropos       String @db.LongText
   phone         String @unique
   email         String @unique
   address       String
-  counrty       String
+  country       String
   city          String
   zip           String
   experiences   Experience[]
@@ -104,6 +106,8 @@ model Experience {
   title       String
   description String @db.LongText
   link        String
+  from        String
+  to          String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -115,12 +119,15 @@ model Evaluation {
   id          Int @id @default(autoincrement())
   note        Int
   commentaire String @db.LongText
-  date        DateTime
+  date        String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   offreur     Offreur @relation(fields: [offreurId], references: [id])
   offreurId    Int
+
+  demandeur     Demandeur @relation(fields: [demandeurId], references: [id])
+  demandeurId    Int
 }
 
 model Projet {

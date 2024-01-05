@@ -4,7 +4,7 @@ import { db } from "../utils/db.server";
 import { sendVerificationEmail } from "../utils/nodemailer";
 import { generateVerificationToken } from '../utils/jwt';
 
-type User = {
+export type User = {
     id: string;
     username: string;
     email: string;
@@ -83,6 +83,7 @@ export const verifyEmail = async (verificationToken: string): Promise<boolean> =
         },
     });
     
+    
     if (user) {
         await db.user.update({
             where: {
@@ -90,10 +91,10 @@ export const verifyEmail = async (verificationToken: string): Promise<boolean> =
             },
             data: {
                 emailVerified: true,
-                verificationToken: "cleared", // Optionally, clear the verification token
+                verificationToken: undefined, // Optionally, clear the verification token
             },
         });
-
+        
         return true; // Verification successful
     }
     

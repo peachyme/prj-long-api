@@ -1,12 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
 import { getAccessToken } from './controllers/auth.controller';
+import { getUserById } from './controllers/user.controller';
+import { getOffreur } from './controllers/offreur.controller';
 
 // Extend the Express Request interface to include the 'user' property
 declare global {
     namespace Express {
         interface Request {
             payload?: any;
+            user?: any;
         }
     }
 }
@@ -27,6 +29,9 @@ export const isAuthenticated = async (request: Request, response: Response, next
         return response.status(401).json({ message: '🚫 Un-Authorized 🚫' });
     }
     request.payload = payload;
+
+    const user = await getUserById(payload.userId);
+    request.user = user;
     
   } catch (error: any) {
     if (error.name === 'TokenExpiredError') {
@@ -35,4 +40,52 @@ export const isAuthenticated = async (request: Request, response: Response, next
     return response.status(401).json('🚫 Un-Authorized 🚫');
   }
   return next();
+}
+
+export const isOffreur = async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const userRole = request.user?.role;
+
+    if (userRole !== 'offreur') {
+      return response.status(403).json('Forbidden: Action requires the role of OFFREUR');
+    }
+
+    return next();
+
+  } catch (error: any) {
+      return response.status(500).json(error.message);
+  }
+}
+
+export const isDemandeur = async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const userRole = request.user?.role;
+
+    if (userRole !== 'demandeur') {
+      return response.status(403).json('Forbidden: Action requires the role of DEMANDEUR');
+    }
+
+    return next();
+
+  } catch (error: any) {
+      return response.status(500).json(error.message);
+  }
+}
+
+export const isProfileOwner = async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const userId = request.user?.id;
+    const OffreurId: number = parseInt(request.params.id, 10);;
+
+    const offreur = await getOffreur(OffreurId);
+
+    if(!offreur || userId !== offreur.user.id) {
+      return response.status(403).json('Forbidden: not previliged');
+    }
+
+    return next();
+
+  } catch (error: any) {
+      return response.status(500).json(error.message);
+  }
 }
