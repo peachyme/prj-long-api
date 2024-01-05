@@ -3,12 +3,12 @@ import type { Response, Request } from "express";
 import { body, validationResult } from "express-validator";
 
 import * as ExperienceController from "../controllers/experience.controller";
-import { isAuthenticated, isOffreur, isProfileOwner } from "../middleware";
+import { isEmailVerified, isAuthenticated, isOffreur, isProfileOwner } from "../middleware";
 
 export const ExperienceRouter = express.Router();
 
 // GET: List of Experiences
-ExperienceRouter.get("/:id/experiences", isAuthenticated, async (request: Request, response: Response) => {
+ExperienceRouter.get("/:id/experiences", isAuthenticated, isEmailVerified, async (request: Request, response: Response) => {
     const id: number = parseInt(request.params.id, 10);
     try {
         const Experiences = await ExperienceController.listExperiences(id)
@@ -19,7 +19,7 @@ ExperienceRouter.get("/:id/experiences", isAuthenticated, async (request: Reques
 });
 
 // GET: show Experience
-ExperienceRouter.get("/:id", isAuthenticated, async (request: Request, response: Response) => {
+ExperienceRouter.get("/:id", isAuthenticated, isEmailVerified, async (request: Request, response: Response) => {
     const id: number = parseInt(request.params.id, 10);
     try {
         const experience = await ExperienceController.getExperience(id);
@@ -33,7 +33,7 @@ ExperienceRouter.get("/:id", isAuthenticated, async (request: Request, response:
 });
 
 // POST: add Experience to offreur
-ExperienceRouter.post("/:id/experiences/add", isAuthenticated, isOffreur, isProfileOwner, body("title").isString(),  
+ExperienceRouter.post("/:id/experiences/add", isAuthenticated, isOffreur, isProfileOwner, isEmailVerified, body("title").isString(),  
                     body("description").isString(), body("link").isString(), body("from").isDate(), 
                     body("to").isDate(), 
                     async (request: Request, response: Response) => {
@@ -54,9 +54,9 @@ ExperienceRouter.post("/:id/experiences/add", isAuthenticated, isOffreur, isProf
 });
 
 // PUT: update Experience
-ExperienceRouter.put("/:id/experiences/:eId/update", isAuthenticated, isOffreur, isProfileOwner, body("title").isString(),  
-                    body("description").isString(), body("link").isString(), body("from").isDate(), 
-                    body("to").isDate(), 
+ExperienceRouter.put("/:id/experiences/:eId/update", isAuthenticated, isOffreur, isProfileOwner, isEmailVerified,
+                    body("title").isString(), body("description").isString(), body("link").isString(), 
+                    body("from").isDate(), body("to").isDate(), 
                     async (request: Request, response: Response
                 ) => {
     const errors = validationResult(request);
@@ -74,7 +74,7 @@ ExperienceRouter.put("/:id/experiences/:eId/update", isAuthenticated, isOffreur,
 });
 
 // DELETE: delete Experience
-ExperienceRouter.delete("/:id/experiences/:eId/delete", isAuthenticated, isOffreur, isProfileOwner, async (request: Request, response: Response) => {
+ExperienceRouter.delete("/:id/experiences/:eId/delete", isAuthenticated, isOffreur, isProfileOwner, isEmailVerified, async (request: Request, response: Response) => {
     const id: number = parseInt(request.params.eId, 10);
     try {
         const { count } = await ExperienceController.deleteExperience(id);

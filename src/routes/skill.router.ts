@@ -3,12 +3,12 @@ import type { Response, Request } from "express";
 import { body, validationResult } from "express-validator";
 
 import * as SkillController from "../controllers/skill.controller";
-import { isAuthenticated, isOffreur } from "../middleware";
+import { isAuthenticated, isEmailVerified, isOffreur } from "../middleware";
 
 export const skillRouter = express.Router();
 
 // GET: List of skills
-skillRouter.get("/", isAuthenticated, async (request: Request, response: Response) => {
+skillRouter.get("/", isAuthenticated, isEmailVerified, async (request: Request, response: Response) => {
     try {
 
         const skills = await SkillController.listSKills()
@@ -34,7 +34,7 @@ skillRouter.get("/:id", async (request: Request, response: Response) => {
 
 // POST: create skill
 // params : label
-skillRouter.post("/create", isAuthenticated, isOffreur, body("label").isString(), async (request: Request, response: Response) => {
+skillRouter.post("/create", isAuthenticated, isOffreur, isEmailVerified, body("label").isString(), async (request: Request, response: Response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
         return response.status(400).json({ errors: errors.array() });

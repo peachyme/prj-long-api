@@ -4,12 +4,12 @@ import { body, validationResult } from "express-validator";
 
 import * as OffreurController from "../controllers/offreur.controller";
 import * as SkillController from "../controllers/skill.controller";
-import { isAuthenticated, isOffreur, isProfileOwner } from "../middleware";
+import { isEmailVerified, isAuthenticated, isOffreur, isProfileOwner } from "../middleware";
 
 export const OffreurRouter = express.Router();
 
 // GET: List of Offreurs
-OffreurRouter.get("/", isAuthenticated, async (request: Request, response: Response) => {
+OffreurRouter.get("/", isAuthenticated, isEmailVerified, async (request: Request, response: Response) => {
     try {
         const Offreurs = await OffreurController.listOffreurs()
         return response.status(200).json(Offreurs);
@@ -19,7 +19,7 @@ OffreurRouter.get("/", isAuthenticated, async (request: Request, response: Respo
 });
 
 // GET: show Offreur
-OffreurRouter.get("/:id", isAuthenticated, async (request: Request, response: Response) => {
+OffreurRouter.get("/:id", isAuthenticated, isEmailVerified, async (request: Request, response: Response) => {
     const id: number = parseInt(request.params.id, 10);
     try {
         const Offreur = await OffreurController.getOffreur(id);
@@ -34,7 +34,7 @@ OffreurRouter.get("/:id", isAuthenticated, async (request: Request, response: Re
 
 // POST: create Offreur
 // params : label
-OffreurRouter.post("/create", isAuthenticated, isOffreur, body("fname").isString(),  body("lname").isString(),
+OffreurRouter.post("/create", isAuthenticated, isOffreur, isEmailVerified, body("fname").isString(),  body("lname").isString(),
                     body("apropos").isString(), body("phone").isString(), body("address").isString(), 
                     body("country").isString(), body("city").isString(), body("zip").isString(),
                     async (request: Request, response: Response
@@ -54,9 +54,10 @@ OffreurRouter.post("/create", isAuthenticated, isOffreur, body("fname").isString
 });
 
 // PUT: update Offreur
-OffreurRouter.put("/:id/update", isAuthenticated, isOffreur, isProfileOwner, body("fname").isString(), 
-                    body("lname").isString(), body("apropos").isString(), body("phone").isString(), 
-                    body("address").isString(), body("country").isString(), body("city").isString(), body("zip").isString(), 
+OffreurRouter.put("/:id/update", isAuthenticated, isOffreur, isProfileOwner, isEmailVerified, 
+                    body("fname").isString(), body("lname").isString(), body("apropos").isString(), 
+                    body("phone").isString(), body("address").isString(), body("country").isString(), 
+                    body("city").isString(), body("zip").isString(), 
                     async (request: Request, response: Response
                 ) => {
     const errors = validationResult(request);
@@ -74,7 +75,7 @@ OffreurRouter.put("/:id/update", isAuthenticated, isOffreur, isProfileOwner, bod
 });
 
 // DELETE: delete Offreur
-OffreurRouter.delete("/:id/delete", isAuthenticated, isOffreur, isProfileOwner, async (request: Request, response: Response) => {
+OffreurRouter.delete("/:id/delete", isAuthenticated, isOffreur, isProfileOwner, isEmailVerified, async (request: Request, response: Response) => {
     const id: number = parseInt(request.params.id, 10);
     try {
         await OffreurController.deleteOffreur(id);
@@ -85,7 +86,7 @@ OffreurRouter.delete("/:id/delete", isAuthenticated, isOffreur, isProfileOwner, 
 });
 
 // POST : add skills to offreur
-OffreurRouter.put("/:id/addSkills", isAuthenticated, isOffreur, isProfileOwner,async (request:Request, response: Response) => {
+OffreurRouter.put("/:id/addSkills", isAuthenticated, isOffreur, isProfileOwner, isEmailVerified, async (request:Request, response: Response) => {
     const offreurId: number = parseInt(request.params.id, 10);
     const { skills } = request.body;
 
@@ -112,7 +113,7 @@ OffreurRouter.put("/:id/addSkills", isAuthenticated, isOffreur, isProfileOwner,a
 
 
 // DELETE : delete skills of offreur
-OffreurRouter.delete("/:id/deleteSkills", isAuthenticated, isOffreur, isProfileOwner,async (request:Request, response: Response) => {
+OffreurRouter.delete("/:id/deleteSkills", isAuthenticated, isOffreur, isProfileOwner, isEmailVerified, async (request:Request, response: Response) => {
     const offreurId: number = parseInt(request.params.id, 10);
     const { skills } = request.body;
 

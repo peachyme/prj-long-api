@@ -75,7 +75,8 @@ authRouter.post('/login', body("username").isString(), async (request: Request, 
         await addAccessToken(accessToken, existingUsername.id);
 
         return response.status(200).json({
-            accessToken,
+            "token": accessToken,
+            "user": existingUsername
         });
     } catch (error: any) {
         return response.status(500).json(error.message);
