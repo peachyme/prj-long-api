@@ -6,6 +6,7 @@ import { skillRouter } from "./routes/skill.router";
 import { authRouter } from "./routes/auth.router";
 import { OffreurRouter } from "./routes/offreur.router";
 import { ExperienceRouter } from "./routes/experience.router";
+import { DemandeurRouter } from "./routes/demandeur.router";
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use('/api/auth', authRouter);
 app.use("/api/skills", skillRouter);
 app.use('/api/offreurs', OffreurRouter);
 app.use('/api/offreur', ExperienceRouter);
+app.use('/api/demandeurs', DemandeurRouter);
 
 app.listen(PORT, () => {
     console.log(`App listening on port ${PORT}`);

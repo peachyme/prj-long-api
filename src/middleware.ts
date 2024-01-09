@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { getAccessToken } from './controllers/auth.controller';
 import { getUserById } from './controllers/user.controller';
 import { getOffreur } from './controllers/offreur.controller';
+import { getDemandeur } from './controllers/demandeur.controller';
 
 // Extend the Express Request interface to include the 'user' property
 declare global {
@@ -95,6 +96,24 @@ export const isProfileOwner = async (request: Request, response: Response, next:
     const offreur = await getOffreur(OffreurId);
 
     if(!offreur || userId !== offreur.user.id) {
+      return response.status(403).json('Forbidden: not previliged');
+    }
+
+    return next();
+
+  } catch (error: any) {
+      return response.status(500).json(error.message);
+  }
+}
+
+export const isDemandeurProfileOwner = async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const userId = request.user?.id;
+    const demandeurId: number = parseInt(request.params.id, 10);;
+
+    const demandeur = await getDemandeur(demandeurId);
+
+    if(!demandeur || userId !== demandeur.user.id) {
       return response.status(403).json('Forbidden: not previliged');
     }
 

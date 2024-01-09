@@ -47,7 +47,7 @@ model Demandeur {
   zip       String
   demandes  Demande[]
   projets   Projet[]
-  evaluations   Evaluation[]
+  evaluations   Evaluation[] 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -126,7 +126,7 @@ model Evaluation {
   offreur     Offreur @relation(fields: [offreurId], references: [id])
   offreurId    Int
 
-  demandeur     Demandeur @relation(fields: [demandeurId], references: [id])
+  demandeur     Demandeur @relation(fields: [demandeurId], references: [id], onDelete: Cascade) 
   demandeurId    Int
 }
 
@@ -185,7 +185,7 @@ model Demande {
   title         String
   description   String @db.LongText
   etat          Etat  @default(envoyee)
-  date_emission DateTime
+  date_emission DateTime @default(now())
   cc            String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
