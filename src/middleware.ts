@@ -3,6 +3,8 @@ import { getAccessToken } from './controllers/auth.controller';
 import { getUserById } from './controllers/user.controller';
 import { getOffreur } from './controllers/offreur.controller';
 import { getDemandeur } from './controllers/demandeur.controller';
+import { demandeBolongsToDemandeur } from './controllers/demande.demandeur.controller';
+import { demandeBolongsToOffreur } from './controllers/demande.offreur.controller';
 
 // Extend the Express Request interface to include the 'user' property
 declare global {
@@ -112,14 +114,53 @@ export const isDemandeurProfileOwner = async (request: Request, response: Respon
     const demandeurId: number = parseInt(request.params.id, 10);;
 
     const demandeur = await getDemandeur(demandeurId);
+    console.log(demandeur);
+    
 
     if(!demandeur || userId !== demandeur.user.id) {
-      return response.status(403).json('Forbidden: not previliged');
+      return response.status(403).json('Forbidden: not prevjjdvsgjviliged');
     }
 
     return next();
 
   } catch (error: any) {
       return response.status(500).json(error.message);
+  }
+}
+
+export const isDemandeOwner = async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const demandeurId: number = parseInt(request.params.id, 10);
+    const demandeId: number = parseInt(request.params.dId, 10);
+
+    const demande = await demandeBolongsToDemandeur(demandeId, demandeurId);
+
+    if(!demande) {
+      return response.status(403).json('Forbidden: not previliged');
+    }
+
+    return next();
+    
+  } catch (error: any) {
+    return response.status(500).json(error.message);
+  }
+}
+
+
+export const isOffreurDemandeOwner = async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const offreurId: number = parseInt(request.params.id, 10);
+    const demandeId: number = parseInt(request.params.dId, 10);
+
+    const demande = await demandeBolongsToOffreur(demandeId, offreurId);
+
+    if(!demande) {
+      return response.status(403).json('Forbidden: not previliged');
+    }
+
+    return next();
+    
+  } catch (error: any) {
+    return response.status(500).json(error.message);
   }
 }

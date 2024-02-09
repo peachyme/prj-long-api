@@ -13,7 +13,7 @@ type Experience = {
 
 // GET: List of Experiences
 export const listExperiences = async (offreurId: number): Promise<Experience[]> => {
-    return db.experience.findMany({
+    return await db.experience.findMany({
         where: {
             offreurId,
         },
@@ -31,7 +31,7 @@ export const listExperiences = async (offreurId: number): Promise<Experience[]> 
 
 // GET: show Experience
 export const getExperience = async (id: number): Promise<Experience | null> => {
-    return db.experience.findUnique({
+    return await db.experience.findUnique({
         where: {
             id,
         },
@@ -42,7 +42,7 @@ export const getExperience = async (id: number): Promise<Experience | null> => {
 export const createExperience = async (experience: Omit<Experience, "id">, offreurId: number): Promise<Experience> => {
     const { title, description, link, from, to } = experience;
 
-    return db.experience.create({
+    return await db.experience.create({
         data: {
             title,
             description,
@@ -66,7 +66,7 @@ export const createExperience = async (experience: Omit<Experience, "id">, offre
 // PUT: update Experience
 export const updateExperience = async (experience: Omit<Experience, "id">, id: number): Promise<Experience> => {
     const { title, description, link, from, to } = experience;
-    return db.experience.update({
+    return await db.experience.update({
         where: {
             id,
         },

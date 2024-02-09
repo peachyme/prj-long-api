@@ -46,7 +46,7 @@ type SearchOffreurCriteria = {
 
 // GET: List of Offreurs
 export const listOffreurs = async (): Promise<OffreurList[]> => {
-    return db.offreur.findMany({
+    return await db.offreur.findMany({
         select: {
             id: true,
             fname: true,
@@ -95,7 +95,7 @@ export const searchOffreurs = async (criteria: SearchOffreurCriteria): Promise<O
     if (zip) whereClause.zip = { contains: zip };
     if (country) whereClause.country = { contains: country };
   
-    return db.offreur.findMany({
+    return await db.offreur.findMany({
       where: whereClause,
       select: {
         id: true,
@@ -124,7 +124,7 @@ export const searchOffreurs = async (criteria: SearchOffreurCriteria): Promise<O
 
 // GET: show Offreur
 export const getOffreur = async (id: number): Promise<Offreur | null> => {
-    return db.offreur.findUnique({
+    return await db.offreur.findUnique({
         where: {
             id,
         },
@@ -158,13 +158,23 @@ export const getOffreur = async (id: number): Promise<Offreur | null> => {
                 }
             },
             evaluations: true,
+            demandes: {
+                select: {
+                    demandeur: true,
+                }
+            },
+            projets: {
+                select: {
+                    taches: true,
+                }
+            },
         },
     });
 };
 
 // GET: show Offreur
 export const offreurHasSkill = async (offreurId: number, skillId: number): Promise<OffreurSkill | null> => {
-    return db.offreurSkill.findUnique({
+    return await db.offreurSkill.findUnique({
         where: {
             offreurId_skillId: {offreurId: offreurId, skillId: skillId},
         },
@@ -174,7 +184,7 @@ export const offreurHasSkill = async (offreurId: number, skillId: number): Promi
 // POST: create Offreur
 export const createOffreur = async (offreur: Omit<Offreur, "id">, user: User): Promise<Offreur> => {
     const { fname, lname, apropos, phone, address, country, city, zip } = offreur;
-    return db.offreur.create({
+    return await db.offreur.create({
         data: {
             fname,
             lname,
@@ -211,7 +221,7 @@ export const createOffreur = async (offreur: Omit<Offreur, "id">, user: User): P
 // PUT: update Offreur
 export const updateOffreur = async (offreur: Omit<Offreur, "id">, id: number): Promise<Offreur> => {
     const { fname, lname, apropos, phone, address, country, city, zip } = offreur;
-    return db.offreur.update({
+    return await db.offreur.update({
         where: {
             id,
         },

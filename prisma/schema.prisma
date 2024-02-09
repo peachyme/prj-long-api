@@ -185,25 +185,39 @@ model Demande {
   title         String
   description   String @db.LongText
   etat          Etat  @default(envoyee)
+  motif_refus   String? @db.LongText
   date_emission DateTime @default(now())
   cc            String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  facture Facture?
+  facture       Facture?
+
+  rdv           Rdv?
 
   offreur     Offreur @relation(fields: [offreurId], references: [id])
-  offreurId   Int
+  offreurId    Int
 
-  demandeur   Demandeur @relation(fields: [demandeurId], references: [id])
-  demandeurId Int
+  demandeur     Demandeur @relation(fields: [demandeurId], references: [id]) 
+  demandeurId    Int
+}
+
+model Rdv {
+  id Int @id @default(autoincrement())
+  type Type
+  heure String
+  date String
+  address String?
+  link String?
+
+  demande          Demande @relation(fields: [demandeId], references: [id])
+  demandeId        Int @unique
 }
 
 model Facture {
   id              Int @id @default(autoincrement())
   montant         Int
-  date_generation DateTime
-  fichier_pdf     String // Chemin ou URL du fichier PDF
+  date_generation DateTime @default(now())
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -230,4 +244,9 @@ enum Etat {
   acceptee
   refusee
   confirmee
+}
+
+enum Type {
+  visio
+  presentiel
 }

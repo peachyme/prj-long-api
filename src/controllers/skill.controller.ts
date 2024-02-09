@@ -8,7 +8,7 @@ export type Skill = {
 
 // GET: List of skills
 export const listSKills = async (): Promise<Skill[]> => {
-    return db.skill.findMany({
+    return await db.skill.findMany({
         select: {
             id: true,
             label: true,
@@ -20,7 +20,7 @@ export const listSKills = async (): Promise<Skill[]> => {
 
 // GET: show skill
 export const getSkill = async (id: number): Promise<Skill | null> => {
-    return db.skill.findUnique({
+    return await db.skill.findUnique({
         where: {
             id,
         },
@@ -30,7 +30,7 @@ export const getSkill = async (id: number): Promise<Skill | null> => {
 // POST: create skill
 export const createSkill = async (skill: Omit<Skill, "id">): Promise<Skill> => {
     const { label } = skill;
-    return db.skill.create({
+    return await db.skill.create({
         data: {
             label,
         },
@@ -46,7 +46,7 @@ export const createSkill = async (skill: Omit<Skill, "id">): Promise<Skill> => {
 // PUT: update skill
 export const updateSkill = async (skill: Omit<Skill, "id">, id: number): Promise<Skill> => {
     const { label } = skill;
-    return db.skill.update({
+    return await db.skill.update({
         where: {
             id,
         },

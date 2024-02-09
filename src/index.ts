@@ -4,9 +4,11 @@ import cors from "cors";
 
 import { skillRouter } from "./routes/skill.router";
 import { authRouter } from "./routes/auth.router";
-import { OffreurRouter } from "./routes/offreur.router";
-import { ExperienceRouter } from "./routes/experience.router";
-import { DemandeurRouter } from "./routes/demandeur.router";
+import { offreurRouter } from "./routes/offreur.router";
+import { experienceRouter } from "./routes/experience.router";
+import { demandeurRouter } from "./routes/demandeur.router";
+import { demandeDemandeurRouter } from "./routes/demande.demandeur.router";
+import { demandeOffreurRouter } from "./routes/demande.offreur.router";
 
 dotenv.config();
 
@@ -22,9 +24,11 @@ app.use(cors());
 app.use(express.json());
 app.use('/api/auth', authRouter);
 app.use("/api/skills", skillRouter);
-app.use('/api/offreurs', OffreurRouter);
-app.use('/api/offreur', ExperienceRouter);
-app.use('/api/demandeurs', DemandeurRouter);
+app.use('/api/offreurs', offreurRouter);
+app.use('/api/offreur', experienceRouter);
+app.use('/api/offreur', demandeOffreurRouter);
+app.use('/api/demandeurs', demandeurRouter);
+app.use('/api/demandeur', demandeDemandeurRouter);
 
 app.listen(PORT, () => {
     console.log(`App listening on port ${PORT}`);

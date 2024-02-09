@@ -18,7 +18,7 @@ type Demandeur = {
 
 // GET: List of Demandeurs
 export const listDemandeurs = async (): Promise<Demandeur[]> => {
-    return db.demandeur.findMany({
+    return await await db.demandeur.findMany({
         select: {
             id: true,
             fname: true,
@@ -42,7 +42,7 @@ export const listDemandeurs = async (): Promise<Demandeur[]> => {
 
 // GET: show Demandeur
 export const getDemandeur = async (id: number): Promise<Demandeur | null> => {
-    return db.demandeur.findUnique({
+    return await db.demandeur.findUnique({
         where: {
             id,
         },
@@ -69,7 +69,7 @@ export const getDemandeur = async (id: number): Promise<Demandeur | null> => {
 // POST: create Demandeur
 export const createDemandeur = async (Demandeur: Omit<Demandeur, "id">, user: User): Promise<Demandeur> => {
     const { fname, lname, phone, address, country, city, zip } = Demandeur;
-    return db.demandeur.create({
+    return await db.demandeur.create({
         data: {
             fname,
             lname,
@@ -104,7 +104,7 @@ export const createDemandeur = async (Demandeur: Omit<Demandeur, "id">, user: Us
 // PUT: update Demandeur
 export const updateDemandeur = async (Demandeur: Omit<Demandeur, "id">, id: number): Promise<Demandeur> => {
     const { fname, lname, phone, address, country, city, zip } = Demandeur;
-    return db.demandeur.update({
+    return await db.demandeur.update({
         where: {
             id,
         },

@@ -12,7 +12,7 @@ type AccessToken = {
 
 // POST: create access token
 export const addAccessToken = async (accessToken: string, userId: string): Promise<Omit<AccessToken, "revoked">> => {
-    return db.accessToken.create({
+    return await db.accessToken.create({
         data: {
             token: accessToken,
             userId,
@@ -22,7 +22,7 @@ export const addAccessToken = async (accessToken: string, userId: string): Promi
 
 // GET: get access token
 export const getAccessToken = async (token: string) : Promise<AccessToken | null> => {
-    return db.accessToken.findUnique({
+    return await db.accessToken.findUnique({
         where: {
             token: token,
         }
@@ -31,7 +31,7 @@ export const getAccessToken = async (token: string) : Promise<AccessToken | null
 
 // delete access token : PUT: cuz we're in fact only updating the revoked field
 export const deleteAccessToken = async (id: string) : Promise<AccessToken> => {
-    return db.accessToken.delete({
+    return await db.accessToken.delete({
         where: {
             id,
         }
@@ -40,7 +40,7 @@ export const deleteAccessToken = async (id: string) : Promise<AccessToken> => {
 
 // revoke all user tokens
 export const deleteAllAccessTokens = async (userId: string): Promise<Prisma.BatchPayload> => {
-    return db.accessToken.deleteMany({
+    return await db.accessToken.deleteMany({
         where: {
             userId,
         }

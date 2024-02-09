@@ -49,7 +49,7 @@ export const createUser = async (user: Omit<User, "id">) : Promise<User> => {
 
 // GET : get user by id
 export const getUserById = async (id: string): Promise<User | null> => {
-    return db.user.findUnique({
+    return await db.user.findUnique({
         where: {
             id,
         }
@@ -57,8 +57,8 @@ export const getUserById = async (id: string): Promise<User | null> => {
 }
 
 // GET : get user by email
-export const getUserByEmail =async (email: string): Promise<User | null> => {
-    return db.user.findUnique({
+export const getUserByEmail = async (email: string): Promise<User | null> => {
+    return await db.user.findUnique({
         where: {
             email,
         }
@@ -66,8 +66,8 @@ export const getUserByEmail =async (email: string): Promise<User | null> => {
 }
 
 // GET : get user by username
-export const getUserByUsername =async (username: string): Promise<User | null> => {
-    return db.user.findUnique({
+export const getUserByUsername = async (username: string): Promise<User | null> => {
+    return await db.user.findUnique({
         where: {
             username,
         }

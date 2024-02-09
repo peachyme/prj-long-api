@@ -11,7 +11,7 @@ export type Evaluation = {
 
 // GET: List of Evaluations
 export const listEvaluations = async (): Promise<Evaluation[]> => {
-    return db.evaluation.findMany({
+    return await db.evaluation.findMany({
         select: {
             id: true,
             note: true,

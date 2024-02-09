@@ -5,10 +5,10 @@ import { body, validationResult } from "express-validator";
 import * as DemandeurController from "../controllers/demandeur.controller";
 import { isEmailVerified, isAuthenticated, isDemandeur, isDemandeurProfileOwner } from "../middleware";
 
-export const DemandeurRouter = express.Router();
+export const demandeurRouter = express.Router();
 
 // GET: List of Demandeurs
-DemandeurRouter.get("/", isAuthenticated, isEmailVerified, async (request: Request, response: Response) => {
+demandeurRouter.get("/", isAuthenticated, isEmailVerified, async (request: Request, response: Response) => {
     try {
         const demandeurs = await DemandeurController.listDemandeurs()
         return response.status(200).json(demandeurs);
@@ -18,7 +18,7 @@ DemandeurRouter.get("/", isAuthenticated, isEmailVerified, async (request: Reque
 });
 
 // GET: show Demandeur
-DemandeurRouter.get("/:id", isAuthenticated, isEmailVerified, async (request: Request, response: Response) => {
+demandeurRouter.get("/:id", isAuthenticated, isEmailVerified, async (request: Request, response: Response) => {
     const id: number = parseInt(request.params.id, 10);
     try {
         const demandeur = await DemandeurController.getDemandeur(id);
@@ -33,7 +33,7 @@ DemandeurRouter.get("/:id", isAuthenticated, isEmailVerified, async (request: Re
 
 // POST: create Demandeur
 // params : label
-DemandeurRouter.post("/create", isAuthenticated, isDemandeur, isEmailVerified, body("fname").isString(),  body("lname").isString(),
+demandeurRouter.post("/create", isAuthenticated, isDemandeur, isEmailVerified, body("fname").isString(),  body("lname").isString(),
                     body("phone").isString(), body("address").isString(), body("country").isString(), 
                     body("city").isString(), body("zip").isString(),
                     async (request: Request, response: Response
@@ -53,7 +53,7 @@ DemandeurRouter.post("/create", isAuthenticated, isDemandeur, isEmailVerified, b
 });
 
 // PUT: update Demandeur
-DemandeurRouter.put("/:id/update", isAuthenticated, isDemandeur, isDemandeurProfileOwner, isEmailVerified, 
+demandeurRouter.put("/:id/update", isAuthenticated, isDemandeur, isDemandeurProfileOwner, isEmailVerified, 
                     body("fname").isString(), body("lname").isString(), body("phone").isString(), 
                     body("address").isString(), body("country").isString(), 
                     body("city").isString(), body("zip").isString(), 
@@ -74,7 +74,7 @@ DemandeurRouter.put("/:id/update", isAuthenticated, isDemandeur, isDemandeurProf
 });
 
 // DELETE: delete Demandeur
-DemandeurRouter.delete("/:id/delete", isAuthenticated, isDemandeur, isDemandeurProfileOwner, isEmailVerified, async (request: Request, response: Response) => {
+demandeurRouter.delete("/:id/delete", isAuthenticated, isDemandeur, isDemandeurProfileOwner, isEmailVerified, async (request: Request, response: Response) => {
     const id: number = parseInt(request.params.id, 10);
     try {
         await DemandeurController.deleteDemandeur(id);
