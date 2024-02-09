@@ -67,13 +67,21 @@ demandeOffreurRouter.put("/:id/demandes/:dId/refuser", isAuthenticated, isEmailV
         return response.status(400).json({ errors: errors.array() });
     }
     try {
-        const etat: Etat = "refusee";
-        const motif = request.body;
-        const demande = {etat, motif_refus: motif.motif_refus}
-        const demandeId = parseInt(request.params.dId, 10);
-        
-        const updatedDemande = await DemandeController.updateEtatDemande(demande, demandeId);
-        return response.status(201).json(updatedDemande);
+        const id: number = parseInt(request.params.dId, 10);
+        const dem = await DemandeController.getDemande(id);
+
+        if (dem?.etat === "confirmee") {
+            return response.status(404).json({"message": "Action cannot be completed : Demande already confirmed"});
+        }
+        else {
+            const etat: Etat = "refusee";
+            const motif = request.body;
+            const demande = {etat, motif_refus: motif.motif_refus}
+            const demandeId = parseInt(request.params.dId, 10);
+            
+            const updatedDemande = await DemandeController.updateEtatDemande(demande, demandeId);
+            return response.status(201).json(updatedDemande);
+        }
     } catch (error: any) {
         return response.status(500).json(error.message);
     }
