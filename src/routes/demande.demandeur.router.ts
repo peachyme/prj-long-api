@@ -64,11 +64,18 @@ demandeDemandeurRouter.put("/:id/demandes/:dId/update", isAuthenticated, isEmail
     if (!errors.isEmpty()) {
         return response.status(400).json({ errors: errors.array() });
     }
-    const id: number = parseInt(request.params.dId, 10);
     try {
-        const demande = request.body;
-        const updatedDemande = await DemandeController.updateDemande(demande, id);
-        return response.status(200).json(updatedDemande);
+        const id: number = parseInt(request.params.dId, 10);
+        const dem = await DemandeController.getDemande(id);
+
+        if (dem?.etat !== "envoyee") {
+            return response.status(404).json({"message": "Demande could not be modified : already being processed"});
+        }
+        else {
+            const demande = request.body;
+            const updatedDemande = await DemandeController.updateDemande(demande, id);
+            return response.status(200).json(updatedDemande);
+        }
     } catch (error: any) {
         return response.status(500).json(error.message);
     }
