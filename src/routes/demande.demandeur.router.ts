@@ -4,6 +4,7 @@ import { body, validationResult } from "express-validator";
 
 import * as DemandeController from "../controllers/demande.demandeur.controller";
 import { isEmailVerified, isAuthenticated, isOffreur, isDemandeur, isDemandeurProfileOwner, isDemandeOwner } from "../middleware";
+import { Etat } from "@prisma/client";
 
 export const demandeDemandeurRouter = express.Router();
 
@@ -73,15 +74,33 @@ demandeDemandeurRouter.put("/:id/demandes/:dId/update", isAuthenticated, isEmail
     }
 });
 
-// DELETE: delete Demande
-demandeDemandeurRouter.delete("/:id/Demandes/:dId/delete", isAuthenticated, isEmailVerified, isDemandeur, isDemandeOwner, async (request: Request, response: Response) => {
-    const id: number = parseInt(request.params.dId, 10);
+// DELETE: cancel Demande
+demandeDemandeurRouter.delete("/:id/Demandes/:dId/cancel", isAuthenticated, isEmailVerified, isDemandeur, isDemandeOwner, 
+                        body("motif_annulation").isString(),
+                        async (request: Request, response: Response) => {
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        return response.status(400).json({ errors: errors.array() });
+    }
     try {
-        const { count } = await DemandeController.cancelDemande(id);
-        if (count > 0) {            
-            return response.status(200).json({"message": "Demande has been successfully canceled"});
-        } else {
-            return response.status(404).json({"message": "Demande could not be found"});
+        const id: number = parseInt(request.params.dId, 10);
+
+        const dem = await DemandeController.getDemande(id);
+
+        if (dem?.etat !== "envoyee") {
+            return response.status(404).json({"message": "Demande could not be canceled : already being processed"});
+        }
+        else {
+            const etat: Etat = "annulee";
+            const motif = request.body;
+            const demande = {etat, motif_annulation: motif.motif_annulation};
+
+            const canceledDemande = await DemandeController.cancelDemande(demande, id);
+            if (canceledDemande) {            
+                return response.status(200).json({"message": "Demande has been successfully canceled"});
+            } else {
+                return response.status(404).json({"message": "Demande could not be found"});
+            }
         }
     } catch (error: any) {
         return response.status(500).json(error.message);
