@@ -18,7 +18,7 @@ type Demandeur = {
 
 // GET: List of Demandeurs
 export const listDemandeurs = async (): Promise<Demandeur[]> => {
-    return await await db.demandeur.findMany({
+    return await db.demandeur.findMany({
         select: {
             id: true,
             fname: true,
