@@ -10,6 +10,7 @@ type Demande = {
     motif_refus: string | null;
     date_emission: Date;
     cc: string;
+    offreurId: number;
 };
 
 type DemandeAnnulee = {
@@ -35,7 +36,8 @@ export const listDemandes = async (demandeurId: number): Promise<Demande[]> => {
             facture: true,
             rdv: true,
             motif_annulation: true,
-            motif_refus: true
+            motif_refus: true,
+            offreurId: true
         }
     });
 };
@@ -57,7 +59,8 @@ export const getDemande = async (id: number): Promise<Demande | null> => {
             facture: true,
             rdv: true,
             motif_annulation: true,
-            motif_refus: true
+            motif_refus: true,
+            offreurId: true
         }
     });
 };
@@ -74,7 +77,7 @@ export const demandeBolongsToDemandeur = async (demandeId: number, demandeurId: 
 }
 
 // POST: create Demande
-export const createDemande = async (demande: Omit<Demande, "id">, offreurId: number, demandeurId: number): Promise<Omit<Demande, "motif_annulation" | "motif_refus">> => {
+export const createDemande = async (demande: Omit<Demande, "id">, offreurId: number, demandeurId: number): Promise<Omit<Demande, "motif_annulation" | "motif_refus" | "offreurId">> => {
     const { title, description, cc } = demande;
 
     return await db.demande.create({
@@ -100,7 +103,7 @@ export const createDemande = async (demande: Omit<Demande, "id">, offreurId: num
 
 
 // POST: update Demande
-export const updateDemande = async (demande: Omit<Demande, "id">, id: number): Promise<Omit<Demande, "motif_annulation" | "motif_refus">> => {
+export const updateDemande = async (demande: Omit<Demande, "id">, id: number): Promise<Omit<Demande, "motif_annulation" | "motif_refus" | "offreurId">> => {
     const { title, description, cc } = demande;
 
     return await db.demande.update({

@@ -3,8 +3,10 @@ import type { Response, Request } from "express";
 import { body, validationResult } from "express-validator";
 
 import * as DemandeController from "../controllers/demande.demandeur.controller";
+import * as OffreurController from "../controllers/offreur.controller";
 import { isEmailVerified, isAuthenticated, isOffreur, isDemandeur, isDemandeurProfileOwner, isDemandeOwner } from "../middleware";
 import { Etat } from "@prisma/client";
+import { sendDemandeAnnuleeEmail, sendDemandeModifieeEmail, sendNewDemandeEmail } from "../utils/nodemailer";
 
 export const demandeDemandeurRouter = express.Router();
 
@@ -34,7 +36,7 @@ demandeDemandeurRouter.get("/:id/demandes/:dId", isAuthenticated, isEmailVerifie
 });
 
 // POST: add Demande to offreur
-demandeDemandeurRouter.post("/:id/demandes/add", isAuthenticated, isEmailVerified,  isDemandeur,  isDemandeurProfileOwner,
+demandeDemandeurRouter.post("/:id/demandes/send", isAuthenticated, isEmailVerified,  isDemandeur,  isDemandeurProfileOwner,
                     body("title").isString(),  body("description").isString(), 
                     body("cc").isString(), body("offreurId").isInt(), 
                     async (request: Request, response: Response) => {
@@ -48,7 +50,19 @@ demandeDemandeurRouter.post("/:id/demandes/add", isAuthenticated, isEmailVerifie
         const demandeurId = parseInt(request.params.id, 10);
         
         const newDemande = await DemandeController.createDemande(demande, demande.offreurId, demandeurId);
-        return response.status(201).json(newDemande);
+
+        const offreur = await OffreurController.getOffreur(demande.offreurId);        
+
+        if (offreur) {
+            sendNewDemandeEmail(offreur.email, offreur.fname, offreur.lname)
+            .then(() => {
+                response.status(201).json({'message' : 'New demande email sent successfully', 'new demande': newDemande});
+            })
+            .catch((error) => {
+                response.status(404).json({'Error sending email:': error});
+            });
+        }
+        
     } catch (error: any) {
         return response.status(500).json(error.message);
     }
@@ -74,7 +88,18 @@ demandeDemandeurRouter.put("/:id/demandes/:dId/update", isAuthenticated, isEmail
         else {
             const demande = request.body;
             const updatedDemande = await DemandeController.updateDemande(demande, id);
-            return response.status(200).json(updatedDemande);
+
+            const offreur = await OffreurController.getOffreur(demande.offreurId);        
+
+            if (offreur) {
+                sendDemandeModifieeEmail(offreur.email, offreur.fname, offreur.lname, demande.title)
+                .then(() => {
+                    response.status(201).json({'message' : 'Demande updated and email sent successfully', 'updated demande': updatedDemande});
+                })
+                .catch((error) => {
+                    response.status(404).json({'Error sending email:': error});
+                });
+            }
         }
     } catch (error: any) {
         return response.status(500).json(error.message);
@@ -103,8 +128,19 @@ demandeDemandeurRouter.delete("/:id/Demandes/:dId/cancel", isAuthenticated, isEm
             const demande = {etat, motif_annulation: motif.motif_annulation};
 
             const canceledDemande = await DemandeController.cancelDemande(demande, id);
-            if (canceledDemande) {            
-                return response.status(200).json({"message": "Demande has been successfully canceled"});
+
+            if (canceledDemande) {  
+                const offreur = await OffreurController.getOffreur(dem.offreurId);        
+
+                if (offreur) {
+                    sendDemandeAnnuleeEmail(offreur.email, offreur.fname, offreur.lname, dem.title)
+                    .then(() => {
+                        response.status(201).json({'message' : 'Demande has been successfully canceled and offreur has been notified'});
+                    })
+                    .catch((error) => {
+                        response.status(404).json({'Error notifying offreur by email:': error});
+                    });
+                }          
             } else {
                 return response.status(404).json({"message": "Demande could not be found"});
             }
