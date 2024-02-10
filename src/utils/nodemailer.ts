@@ -124,3 +124,128 @@ export const sendDemandeModifieeEmail = (to: string, nom: string, prenom: string
 
   return transporter.sendMail(mailOptions);
 };
+
+export const sendDemandeEnvoyeeEmail = (to: string, nom: string, prenom: string, titre: string) => {
+
+  const handlebarOptions: any = {
+    viewEngine: {
+      extName: ".handlebars",
+      partialsDir: path.resolve('./src/utils/emailTemplates'),
+      defaultLayout: false,
+    },
+    viewPath: path.resolve('./src/utils/emailTemplates'),
+    extName: ".handlebars",
+  };
+  transporter.use('compile', hbs(handlebarOptions));
+
+  
+  var mailOptions = {
+    from: '"TalentoLink" <hadjer.messaoudene18@gmail.com>',
+    to,
+    subject: 'Demande envoyée avec succès',
+    template: 'demandeEnvoyeeEmail',
+    context: {
+      title: 'Demande de Service Envoyée avec succès',
+      nom,
+      prenom,
+      titre,
+    }
+  
+  };
+
+  return transporter.sendMail(mailOptions);
+};
+
+export const sendDemandeTraiteeEmail = (to: string, nom: string, prenom: string, titre: string) => {
+
+  const handlebarOptions: any = {
+    viewEngine: {
+      extName: ".handlebars",
+      partialsDir: path.resolve('./src/utils/emailTemplates'),
+      defaultLayout: false,
+    },
+    viewPath: path.resolve('./src/utils/emailTemplates'),
+    extName: ".handlebars",
+  };
+  transporter.use('compile', hbs(handlebarOptions));
+
+  
+  var mailOptions = {
+    from: '"TalentoLink" <hadjer.messaoudene18@gmail.com>',
+    to,
+    subject: 'Demande en cours de traitement',
+    template: 'demandeTraiteeEmail',
+    context: {
+      title: 'Demande de Service En Cours de Traitement',
+      nom,
+      prenom,
+      titre,
+    }
+  
+  };
+
+  return transporter.sendMail(mailOptions);
+};
+
+export const sendDemandeAccepteeEmail = (to: string, nom: string, prenom: string, titre: string) => {
+
+  const handlebarOptions: any = {
+    viewEngine: {
+      extName: ".handlebars",
+      partialsDir: path.resolve('./src/utils/emailTemplates'),
+      defaultLayout: false,
+    },
+    viewPath: path.resolve('./src/utils/emailTemplates'),
+    extName: ".handlebars",
+  };
+  transporter.use('compile', hbs(handlebarOptions));
+
+  
+  var mailOptions = {
+    from: '"TalentoLink" <hadjer.messaoudene18@gmail.com>',
+    to,
+    subject: 'Demande Acceptée',
+    template: 'demandeAccepteeEmail',
+    context: {
+      title: 'Demande de Service Acceptée',
+      nom,
+      prenom,
+      titre,
+    }
+  
+  };
+
+  return transporter.sendMail(mailOptions);
+};
+
+export const sendDemandeRefuseeEmail = (to: string, nom: string, prenom: string, titre: string) => {
+
+  const handlebarOptions: any = {
+    viewEngine: {
+      extName: ".handlebars",
+      partialsDir: path.resolve('./src/utils/emailTemplates'),
+      defaultLayout: false,
+    },
+    viewPath: path.resolve('./src/utils/emailTemplates'),
+    extName: ".handlebars",
+  };
+  transporter.use('compile', hbs(handlebarOptions));
+
+  
+  var mailOptions = {
+    from: '"TalentoLink" <hadjer.messaoudene18@gmail.com>',
+    to,
+    subject: 'Demande de Service Refusée',
+    template: 'demandeRefuseeEmail',
+    context: {
+      title: 'Demande de Service Refusée',
+      nom,
+      prenom,
+      titre,
+    }
+  
+  };
+
+  return transporter.sendMail(mailOptions);
+};
+

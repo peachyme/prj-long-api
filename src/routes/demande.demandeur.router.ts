@@ -4,9 +4,10 @@ import { body, validationResult } from "express-validator";
 
 import * as DemandeController from "../controllers/demande.demandeur.controller";
 import * as OffreurController from "../controllers/offreur.controller";
+import * as DemandeurController from "../controllers/demandeur.controller";
 import { isEmailVerified, isAuthenticated, isOffreur, isDemandeur, isDemandeurProfileOwner, isDemandeOwner } from "../middleware";
 import { Etat } from "@prisma/client";
-import { sendDemandeAnnuleeEmail, sendDemandeModifieeEmail, sendNewDemandeEmail } from "../utils/nodemailer";
+import { sendDemandeAnnuleeEmail, sendDemandeEnvoyeeEmail, sendDemandeModifieeEmail, sendNewDemandeEmail } from "../utils/nodemailer";
 
 export const demandeDemandeurRouter = express.Router();
 
@@ -51,9 +52,13 @@ demandeDemandeurRouter.post("/:id/demandes/send", isAuthenticated, isEmailVerifi
         
         const newDemande = await DemandeController.createDemande(demande, demande.offreurId, demandeurId);
 
-        const offreur = await OffreurController.getOffreur(demande.offreurId);        
+        
 
-        if (offreur) {
+        const offreur = await OffreurController.getOffreur(demande.offreurId);   
+        const demandeur = await DemandeurController.getDemandeur(demandeurId);       
+
+        if (offreur && demandeur) {
+            sendDemandeEnvoyeeEmail(demandeur.email, demandeur.fname, demandeur.lname, demande.title)
             sendNewDemandeEmail(offreur.email, offreur.fname, offreur.lname)
             .then(() => {
                 response.status(201).json({'message' : 'New demande email sent successfully', 'new demande': newDemande});

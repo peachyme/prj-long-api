@@ -3,8 +3,10 @@ import type { Response, Request } from "express";
 import { body, validationResult } from "express-validator";
 
 import * as DemandeController from "../controllers/demande.offreur.controller";
+import * as DemandeurController from "../controllers/demandeur.controller";
 import { isEmailVerified, isAuthenticated, isOffreur, isProfileOwner, isOffreurDemandeOwner } from "../middleware";
 import { Etat } from "@prisma/client";
+import { sendDemandeAccepteeEmail, sendDemandeRefuseeEmail, sendDemandeTraiteeEmail } from "../utils/nodemailer";
 
 export const demandeOffreurRouter = express.Router();
 
@@ -51,7 +53,18 @@ demandeOffreurRouter.put("/:id/demandes/:dId/traiter", isAuthenticated, isEmailV
         
         const updatedDemande = await DemandeController.updateEtatDemande(demande, demandeId);
         await DemandeController.planRdv(rdv, demandeId);
-        return response.status(201).json(updatedDemande);
+
+        const demandeur = await DemandeurController.getDemandeur(updatedDemande.demandeurId);        
+
+        if (demandeur) {
+            sendDemandeTraiteeEmail(demandeur.email, demandeur.fname, demandeur.lname, updatedDemande.title)
+            .then(() => {
+                response.status(201).json({'message' : 'Demande En Cours de Traitement and email sent successfully', 'updated demande': updatedDemande});
+            })
+            .catch((error) => {
+                response.status(404).json({'Error sending email:': error});
+            });
+        }
     } catch (error: any) {
         return response.status(500).json(error.message);
     }
@@ -80,7 +93,18 @@ demandeOffreurRouter.put("/:id/demandes/:dId/refuser", isAuthenticated, isEmailV
             const demandeId = parseInt(request.params.dId, 10);
             
             const updatedDemande = await DemandeController.updateEtatDemande(demande, demandeId);
-            return response.status(201).json(updatedDemande);
+
+            const demandeur = await DemandeurController.getDemandeur(updatedDemande.demandeurId);        
+
+            if (demandeur) {
+                sendDemandeRefuseeEmail(demandeur.email, demandeur.fname, demandeur.lname, updatedDemande.title)
+                .then(() => {
+                    response.status(201).json({'message' : 'Demande Refusée and email sent successfully', 'updated demande': updatedDemande});
+                })
+                .catch((error) => {
+                    response.status(404).json({'Error sending email:': error});
+                });
+            }
         }
     } catch (error: any) {
         return response.status(500).json(error.message);
@@ -104,8 +128,19 @@ demandeOffreurRouter.put("/:id/demandes/:dId/accepter", isAuthenticated, isEmail
         const demandeId = parseInt(request.params.dId, 10);
         
         const updatedDemande = await DemandeController.updateEtatDemande(demande, demandeId);
-        await DemandeController.generateFacture(facture, demandeId);
-        return response.status(201).json(updatedDemande);
+        const generatedFacture = await DemandeController.generateFacture(facture, demandeId);
+
+        const demandeur = await DemandeurController.getDemandeur(updatedDemande.demandeurId);        
+
+        if (updatedDemande && generatedFacture && demandeur) {
+            sendDemandeAccepteeEmail(demandeur.email, demandeur.fname, demandeur.lname, updatedDemande.title)
+            .then(() => {
+                response.status(201).json({'message' : 'Demande Acceptée and email sent successfully', 'updated demande': updatedDemande});
+            })
+            .catch((error) => {
+                response.status(404).json({'Error sending email:': error});
+            });
+        }
     } catch (error: any) {
         return response.status(500).json(error.message);
     }

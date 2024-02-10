@@ -9,6 +9,7 @@ type Demande = {
     motif_refus: string | null;
     date_emission: Date;
     cc: string;
+    demandeurId: number;
 };
 
 type Rdv = {
@@ -41,6 +42,7 @@ export const listDemandes = async (offreurId: number): Promise<Demande[]> => {
             demandeur: true,
             facture: true,
             rdv: true,
+            demandeurId: true,
         }
     });
 };
@@ -62,6 +64,7 @@ export const getDemande = async (id: number): Promise<Demande | null> => {
             demandeur: true,
             facture: true,
             rdv: true,
+            demandeurId: true
         }
     });
 };
@@ -78,7 +81,7 @@ export const demandeBolongsToOffreur = async (demandeId: number, offreurId: numb
 
 
 // PUT: update etat Demande
-export const updateEtatDemande = async (demande: Omit<Demande, "id" | "title" | "description" | "date_emission" | "cc">, id: number): Promise<Demande> => {
+export const updateEtatDemande = async (demande: Omit<Demande, "id" | "title" | "description" | "date_emission" | "cc" | "demandeurId">, id: number): Promise<Demande> => {
     const { etat, motif_refus } = demande;
     return await db.demande.update({
         where: {
@@ -100,6 +103,7 @@ export const updateEtatDemande = async (demande: Omit<Demande, "id" | "title" | 
             demandeur: true,
             facture: true,
             rdv: true,
+            demandeurId: true
         },
     });
 };
