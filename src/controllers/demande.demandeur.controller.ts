@@ -1,6 +1,14 @@
 import { Etat, Prisma, Type } from "@prisma/client";
 import { db } from "../utils/db.server";
 
+type Facture = {
+    id: number; 
+    montant: number; 
+    date_generation: Date; 
+    createdAt: Date; 
+    updatedAt: Date; 
+    demandeId: number;
+}
 type Demande = {
     id: number;
     title: string;
@@ -11,6 +19,7 @@ type Demande = {
     date_emission: Date;
     cc: string;
     offreurId: number;
+    facture: Facture | null;
 };
 
 type DemandeAnnulee = {
@@ -67,7 +76,7 @@ export const getDemande = async (id: number): Promise<Demande | null> => {
 
 
 // check if demande belongs to demandeur
-export const demandeBolongsToDemandeur = async (demandeId: number, demandeurId: number): Promise<Demande | null> => {
+export const demandeBolongsToDemandeur = async (demandeId: number, demandeurId: number): Promise<Omit<Demande, "facture"> | null > => {
     return await db.demande.findUnique({
         where: {
             id: demandeId,
@@ -77,7 +86,7 @@ export const demandeBolongsToDemandeur = async (demandeId: number, demandeurId: 
 }
 
 // POST: create Demande
-export const createDemande = async (demande: Omit<Demande, "id">, offreurId: number, demandeurId: number): Promise<Omit<Demande, "motif_annulation" | "motif_refus" | "offreurId">> => {
+export const createDemande = async (demande: Omit<Demande, "id">, offreurId: number, demandeurId: number): Promise<Omit<Demande, "motif_annulation" | "motif_refus" | "offreurId" | "facture">> => {
     const { title, description, cc } = demande;
 
     return await db.demande.create({
@@ -103,7 +112,7 @@ export const createDemande = async (demande: Omit<Demande, "id">, offreurId: num
 
 
 // POST: update Demande
-export const updateDemande = async (demande: Omit<Demande, "id">, id: number): Promise<Omit<Demande, "motif_annulation" | "motif_refus" | "offreurId">> => {
+export const updateDemande = async (demande: Omit<Demande, "id">, id: number): Promise<Omit<Demande, "motif_annulation" | "motif_refus" | "offreurId" | "facture">> => {
     const { title, description, cc } = demande;
 
     return await db.demande.update({
@@ -129,8 +138,8 @@ export const updateDemande = async (demande: Omit<Demande, "id">, id: number): P
 };
 
 
-// POST: cancel Demande
-export const cancelDemande = async (demande: DemandeAnnulee, id: number): Promise<Demande> => {
+//  cancel Demande
+export const cancelDemande = async (demande: DemandeAnnulee, id: number): Promise<Omit<Demande, "facture">> => {
     const { etat, motif_annulation } = demande;
     return await db.demande.update({
         where: {
@@ -139,6 +148,19 @@ export const cancelDemande = async (demande: DemandeAnnulee, id: number): Promis
         data: {
             etat,
             motif_annulation
+        }
+    });
+};
+
+
+// confirm Demande
+export const confirmDemande = async (id: number): Promise<Omit<Demande, "facture">> => {
+    return await db.demande.update({
+        where: {
+            id
+        },
+        data: {
+            etat: "confirmee",
         }
     });
 };

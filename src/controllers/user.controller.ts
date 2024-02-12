@@ -33,7 +33,7 @@ export const createUser = async (user: Omit<User, "id">) : Promise<User> => {
     });
 
     // Create the verification link
-    const verificationLink = `http://localhost:8080/api/auth/verify?token=${verificationToken}`;
+    const verificationLink = `${process.env.SERVER_URL}/auth/verify?token=${verificationToken}`;
 
     // Send the verification email
     sendVerificationEmail(user.email, verificationLink)

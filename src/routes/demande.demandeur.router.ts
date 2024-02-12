@@ -111,8 +111,8 @@ demandeDemandeurRouter.put("/:id/demandes/:dId/update", isAuthenticated, isEmail
     }
 });
 
-// DELETE: cancel Demande
-demandeDemandeurRouter.delete("/:id/Demandes/:dId/cancel", isAuthenticated, isEmailVerified, isDemandeur, isDemandeOwner, 
+// PUT: cancel Demande
+demandeDemandeurRouter.put("/:id/demandes/:dId/cancel", isAuthenticated, isEmailVerified, isDemandeur, isDemandeOwner, 
                         body("motif_annulation").isString(),
                         async (request: Request, response: Response) => {
     const errors = validationResult(request);
@@ -154,3 +154,4 @@ demandeDemandeurRouter.delete("/:id/Demandes/:dId/cancel", isAuthenticated, isEm
         return response.status(500).json(error.message);
     }
 });
+
