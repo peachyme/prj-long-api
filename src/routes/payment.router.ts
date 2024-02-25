@@ -3,9 +3,12 @@ import type { Response, Request } from "express";
 import Stripe from "stripe";
 
 import * as DemandeController from "../controllers/demande.demandeur.controller";
+import * as ProjetController from "../controllers/project.offreur.controller";
+import * as DemandeurController from "../controllers/demandeur.controller";
+import * as OffreurController from "../controllers/offreur.controller";
 import { isEmailVerified, isAuthenticated, isDemandeur, isDemandeurProfileOwner, isDemandeOwner } from "../middleware";
 import { Etat } from "@prisma/client";
-import { sendDemandeAnnuleeEmail, sendDemandeEnvoyeeEmail, sendDemandeModifieeEmail, sendNewDemandeEmail } from "../utils/nodemailer";
+import { sendDemandeAnnuleeEmail, sendDemandeConfirmeeEmail, sendDemandeConfirmeeOffreurEmail, sendDemandeEnvoyeeEmail, sendDemandeModifieeEmail, sendNewDemandeEmail } from "../utils/nodemailer";
 
 export const paymentRouter = express.Router();
 const stripe = new Stripe(process.env.STRIPE_PRIVATE_KEY!);
@@ -21,7 +24,7 @@ paymentRouter.put("/:id/demandes/:dId/create-checkout-session", isAuthenticated,
         const demande = await DemandeController.getDemande(id);
 
         if (demande?.etat !== "acceptee") {
-            return response.status(404).json({"message": "Action forbidden : Demande not accepted"});
+            return response.status(404).json({"message": "Action forbidden : Demande not accepted or already paid"});
         }
         else {
             const session = await stripe.checkout.sessions.create({
@@ -43,9 +46,10 @@ paymentRouter.put("/:id/demandes/:dId/create-checkout-session", isAuthenticated,
                 cancel_url: `${process.env.SERVER_URL}/cancel`,
                 metadata: {
                     demandeId: demande.id
-                }
+                },
+
               });
-              response.json({ session, demande });
+              response.json({ session });
         }
     } catch (error: any) {
         return response.status(500).json(error.message);
@@ -64,16 +68,36 @@ paymentRouter.post('/webhook', async (req: Request, res: Response) => {
             // get the metadata from the session aka la demande and confirm it
             if (session.metadata) {
                 const demandeId =  parseInt(session.metadata.demandeId, 10);
-                const confirmedDemande = await DemandeController.confirmDemande(demandeId);
-                console.log(confirmedDemande);
+
+                // confirm demande :
+                const confirmedDemande = await DemandeController.confirmDemande(demandeId);    
+                
+                const demandeur = await DemandeurController.getDemandeur(confirmedDemande.demandeurId)
+                const offreur = await OffreurController.getOffreur(confirmedDemande.offreurId)
+
+                // create project :
+                const projet = {
+                    title: confirmedDemande.title,
+                    description: confirmedDemande.description, 
+                    cc: confirmedDemande.cc, 
+                    demandeurId: confirmedDemande.demandeurId,
+                    offreurId: confirmedDemande.offreurId 
+                }
+                await ProjetController.createProjet(projet);
+
+                if (demandeur && offreur) {
+                    sendDemandeConfirmeeEmail(demandeur.email, demandeur.lname, demandeur.fname, confirmedDemande.title);
+                    sendDemandeConfirmeeOffreurEmail(offreur.email, offreur.lname, offreur.fname, confirmedDemande.title)
+                }
+                
+                
                 
             }
            
         }
     
     } catch (error: any) {
-      console.error('Error verifying webhook signature:', error.message);
-      return res.status(400).send(`Webhook Error: ${error.message}`);
+        return res.status(400).send(`Webhook Error: ${error.message}`);
     }
   
 

@@ -158,11 +158,6 @@ export const getOffreur = async (id: number): Promise<Offreur | null> => {
                 }
             },
             evaluations: true,
-            demandes: {
-                select: {
-                    demandeur: true,
-                }
-            },
             projets: {
                 select: {
                     taches: true,

@@ -19,6 +19,7 @@ type Demande = {
     date_emission: Date;
     cc: string;
     offreurId: number;
+    demandeurId: number;
     facture: Facture | null;
 };
 
@@ -46,7 +47,8 @@ export const listDemandes = async (demandeurId: number): Promise<Demande[]> => {
             rdv: true,
             motif_annulation: true,
             motif_refus: true,
-            offreurId: true
+            offreurId: true,
+            demandeurId: true
         }
     });
 };
@@ -69,7 +71,8 @@ export const getDemande = async (id: number): Promise<Demande | null> => {
             rdv: true,
             motif_annulation: true,
             motif_refus: true,
-            offreurId: true
+            offreurId: true,
+            demandeurId: true
         }
     });
 };
@@ -86,7 +89,7 @@ export const demandeBolongsToDemandeur = async (demandeId: number, demandeurId: 
 }
 
 // POST: create Demande
-export const createDemande = async (demande: Omit<Demande, "id">, offreurId: number, demandeurId: number): Promise<Omit<Demande, "motif_annulation" | "motif_refus" | "offreurId" | "facture">> => {
+export const createDemande = async (demande: Omit<Demande, "id">, offreurId: number, demandeurId: number): Promise<Omit<Demande, "motif_annulation" | "motif_refus" | "offreurId" | "demandeurId" | "facture">> => {
     const { title, description, cc } = demande;
 
     return await db.demande.create({
@@ -112,7 +115,7 @@ export const createDemande = async (demande: Omit<Demande, "id">, offreurId: num
 
 
 // POST: update Demande
-export const updateDemande = async (demande: Omit<Demande, "id">, id: number): Promise<Omit<Demande, "motif_annulation" | "motif_refus" | "offreurId" | "facture">> => {
+export const updateDemande = async (demande: Omit<Demande, "id">, id: number): Promise<Omit<Demande, "motif_annulation" | "motif_refus" | "offreurId" | "demandeurId" | "facture">> => {
     const { title, description, cc } = demande;
 
     return await db.demande.update({

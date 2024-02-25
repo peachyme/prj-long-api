@@ -135,10 +135,10 @@ model Projet {
   title       String
   description String @db.LongText
   cc          String
-  duree       Int
-  date_deb    DateTime
-  date_fin    DateTime
-  etat        String
+  duree       Int?
+  date_deb    DateTime @default(now())
+  date_fin    DateTime?
+  etat        EtatProjet
   taches      Tache[]
   membres     MembreProjet[]
   createdAt   DateTime @default(now())
@@ -246,6 +246,11 @@ enum Etat {
   refusee
   confirmee
   annulee
+}
+
+enum EtatProjet {
+  enCours
+  cloture
 }
 
 enum Type {

@@ -249,3 +249,65 @@ export const sendDemandeRefuseeEmail = (to: string, nom: string, prenom: string,
   return transporter.sendMail(mailOptions);
 };
 
+export const sendDemandeConfirmeeEmail = (to: string, nom: string, prenom: string, titre: string) => {
+
+  const handlebarOptions: any = {
+    viewEngine: {
+      extName: ".handlebars",
+      partialsDir: path.resolve('./src/utils/emailTemplates'),
+      defaultLayout: false,
+    },
+    viewPath: path.resolve('./src/utils/emailTemplates'),
+    extName: ".handlebars",
+  };
+  transporter.use('compile', hbs(handlebarOptions));
+
+  
+  var mailOptions = {
+    from: '"TalentoLink" <hadjer.messaoudene18@gmail.com>',
+    to,
+    subject: 'Demande de Service Confirmée',
+    template: 'demandeConfirmeeEmail',
+    context: {
+      title: 'Demande de Service Confirmée',
+      nom,
+      prenom,
+      titre,
+    }
+  
+  };
+
+  return transporter.sendMail(mailOptions);
+};
+
+export const sendDemandeConfirmeeOffreurEmail = (to: string, nom: string, prenom: string, titre: string) => {
+
+  const handlebarOptions: any = {
+    viewEngine: {
+      extName: ".handlebars",
+      partialsDir: path.resolve('./src/utils/emailTemplates'),
+      defaultLayout: false,
+    },
+    viewPath: path.resolve('./src/utils/emailTemplates'),
+    extName: ".handlebars",
+  };
+  transporter.use('compile', hbs(handlebarOptions));
+
+  
+  var mailOptions = {
+    from: '"TalentoLink" <hadjer.messaoudene18@gmail.com>',
+    to,
+    subject: 'Demande de Service Confirmée',
+    template: 'demandeConfirmeeOffreurEmail',
+    context: {
+      title: 'Demande de Service Confirmée',
+      nom,
+      prenom,
+      titre,
+    }
+  
+  };
+
+  return transporter.sendMail(mailOptions);
+};
+
