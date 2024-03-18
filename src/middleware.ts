@@ -5,6 +5,7 @@ import { getOffreur } from './controllers/offreur.controller';
 import { getDemandeur } from './controllers/demandeur.controller';
 import { demandeBolongsToDemandeur } from './controllers/demande.demandeur.controller';
 import { demandeBolongsToOffreur } from './controllers/demande.offreur.controller';
+import { projetBolongsToOffreur } from './controllers/project.offreur.controller';
 
 // Extend the Express Request interface to include the 'user' property
 declare global {
@@ -155,6 +156,25 @@ export const isOffreurDemandeOwner = async (request: Request, response: Response
     const demande = await demandeBolongsToOffreur(demandeId, offreurId);
 
     if(!demande) {
+      return response.status(403).json('Forbidden: not previliged');
+    }
+
+    return next();
+    
+  } catch (error: any) {
+    return response.status(500).json(error.message);
+  }
+}
+
+
+export const isProjectOwner = async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const offreurId: number = parseInt(request.params.id, 10);
+    const projectId: number = parseInt(request.params.pId, 10);
+
+    const projet = await projetBolongsToOffreur(projectId, offreurId);
+
+    if(!projet) {
       return response.status(403).json('Forbidden: not previliged');
     }
 
