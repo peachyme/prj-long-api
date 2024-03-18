@@ -1,4 +1,4 @@
-import { Etat, EtatProjet } from "@prisma/client";
+import { EtatProjet } from "@prisma/client";
 import { db } from "../utils/db.server";
 
 type Projet = {
@@ -59,6 +59,7 @@ export const getProjet = async (id: number): Promise<Projet | null> => {
         include: {
             demandeur: true,
             demande: true,
+            membres: true
         }
     });
 };

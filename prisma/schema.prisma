@@ -164,7 +164,7 @@ model MembreProjet {
   projetId  Int
   projet    Projet @relation(fields: [projetId], references: [id])
 
-  level     Int
+  role     String
   @@id([offreurId, projetId])
 }
 
