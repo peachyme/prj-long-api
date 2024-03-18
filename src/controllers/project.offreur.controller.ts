@@ -11,14 +11,15 @@ type Projet = {
     date_deb: Date;
     date_fin: Date | null;
     demandeurId: number;
-    offreurId: number
+    offreurId: number;
+    demandeId: number;
 };
 
 
 
 // create projet
 export const createProjet = async (projet: Omit<Projet, "id"| "duree"| "date_deb" | "etat" | "date_fin">): Promise<Projet> => {
-    const { title, description, cc, demandeurId, offreurId } = projet;
+    const { title, description, cc, demandeurId, offreurId, demandeId } = projet;
 
     return await db.projet.create({
         data: {
@@ -28,21 +29,12 @@ export const createProjet = async (projet: Omit<Projet, "id"| "duree"| "date_deb
             etat: "enCours",
             offreurId,
             demandeurId,
+            demandeId
         },
-        select: {
-            id: true,
-            title: true,
-            description: true,
-            etat: true,
-            cc: true,
-            duree: true,
-            date_deb: true,
-            date_fin: true,
-            demandeurId: true,
-            offreurId: true,
+        include: {
             offreur: true,
             demandeur: true,
-        },
+        }
     });
 }
 
@@ -52,18 +44,8 @@ export const listProjets = async (offreurId: number): Promise<Projet[]> => {
         where: {
             offreurId,
         },
-        select: {
-            id: true,
-            title: true,
-            description: true,
-            etat: true,
-            cc: true,
-            duree: true,
-            date_deb: true,
-            date_fin: true,
+        include: {
             demandeur: true,
-            demandeurId: true,
-            offreurId: true,
         }
     });
 };
@@ -74,18 +56,9 @@ export const getProjet = async (id: number): Promise<Projet | null> => {
         where: {
             id,
         },
-        select: {
-            id: true,
-            title: true,
-            description: true,
-            etat: true,
-            cc: true,
-            duree: true,
-            date_deb: true,
-            date_fin: true,
+        include: {
             demandeur: true,
-            demandeurId: true,
-            offreurId: true,
+            demande: true,
         }
     });
 };
@@ -110,18 +83,9 @@ export const updateEtatProjet = async (etat: EtatProjet, id: number): Promise<Pr
         data: {
             etat,
         },
-        select: {
-            id: true,
-            title: true,
-            description: true,
-            etat: true,
-            cc: true,
-            duree: true,
-            date_deb: true,
-            date_fin: true,
+        include: {
             demandeur: true,
-            demandeurId: true,
-            offreurId: true,
+            demande: true,
         },
     });
 };

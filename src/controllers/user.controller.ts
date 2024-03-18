@@ -70,6 +70,10 @@ export const getUserByUsername = async (username: string): Promise<User | null> 
     return await db.user.findUnique({
         where: {
             username,
+        }, 
+        include: {
+            offreur: true,
+            demandeur: true
         }
     })
 }

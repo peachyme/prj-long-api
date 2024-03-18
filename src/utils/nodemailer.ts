@@ -7,7 +7,7 @@ const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: "hadjer.messaoudene18@gmail.com",
-    pass: "huvi nsgq lakp cfyj",
+    pass: "nijt exbg pmuz fmkv",
   },
 });
 
@@ -183,7 +183,7 @@ export const sendDemandeTraiteeEmail = (to: string, nom: string, prenom: string,
     }
   
   };
-
+  
   return transporter.sendMail(mailOptions);
 };
 

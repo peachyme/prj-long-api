@@ -81,7 +81,8 @@ paymentRouter.post('/webhook', async (req: Request, res: Response) => {
                     description: confirmedDemande.description, 
                     cc: confirmedDemande.cc, 
                     demandeurId: confirmedDemande.demandeurId,
-                    offreurId: confirmedDemande.offreurId 
+                    offreurId: confirmedDemande.offreurId,
+                    demandeId: confirmedDemande.id
                 }
                 await ProjetController.createProjet(projet);
 
