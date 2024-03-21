@@ -311,3 +311,35 @@ export const sendDemandeConfirmeeOffreurEmail = (to: string, nom: string, prenom
   return transporter.sendMail(mailOptions);
 };
 
+
+export const sendMembreProjetMail = (to: string, nom: string, prenom: string, fromN: string | undefined, fromP: string | undefined, titre: string) => {
+
+  const handlebarOptions: any = {
+    viewEngine: {
+      extName: ".handlebars",
+      partialsDir: path.resolve('./src/utils/emailTemplates'),
+      defaultLayout: false,
+    },
+    viewPath: path.resolve('./src/utils/emailTemplates'),
+    extName: ".handlebars",
+  };
+  transporter.use('compile', hbs(handlebarOptions));
+
+  
+  var mailOptions = {
+    from: '"TalentoLink" <hadjer.messaoudene18@gmail.com>',
+    to,
+    subject: 'Vous avez été ajouté comme membre du projet',
+    template: 'membrePrjEmail',
+    context: {
+      title: 'Vous avez été ajouté comme membre du projet',
+      nom,
+      prenom,
+      titre,
+    }
+  
+  };
+
+  return transporter.sendMail(mailOptions);
+};
+
