@@ -13,7 +13,7 @@ type Offreur = {
     city: string;
     zip: string;
     country: string;
-    user: Omit<User, "email" | "password" | "role">;
+    user: Omit<User, "email" | "password" | "role" | "offreur" | "demandeur">;
 };
 
 type OffreurSkill = {

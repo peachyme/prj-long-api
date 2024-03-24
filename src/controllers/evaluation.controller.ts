@@ -4,20 +4,17 @@ import { db } from "../utils/db.server";
 export type Evaluation = {
     note: number;
     commentaire: string;
-    date: string;
-    demandeur: Demandeur;
-
 };
 
-// GET: List of Evaluations
-export const listEvaluations = async (): Promise<Evaluation[]> => {
-    return await db.evaluation.findMany({
-        select: {
-            id: true,
-            note: true,
-            commentaire: true,
-            date: true,
-            demandeur: true,
+// submit evaluation
+export const newEvaluation = async (evaluation: Evaluation, demandeurId: number, offreurId: number): Promise<Evaluation> => {
+    const {note, commentaire} = evaluation;
+    return await db.evaluation.create({
+        data: {
+            note,
+            commentaire,
+            demandeurId,
+            offreurId,
         },
     });
 };

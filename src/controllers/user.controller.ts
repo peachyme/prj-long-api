@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { Role } from '@prisma/client';
+import { Demandeur, Offreur, Role } from '@prisma/client';
 import { db } from "../utils/db.server";
 import { sendVerificationEmail } from "../utils/nodemailer";
 import { generateVerificationToken } from '../utils/jwt';
@@ -10,10 +10,12 @@ export type User = {
     email: string;
     password: string;
     role: Role;
+    offreur: Offreur | null;
+    demandeur: Demandeur | null
 }
 
 // POST: create user
-export const createUser = async (user: Omit<User, "id">) : Promise<User> => {
+export const createUser = async (user: Omit<User, "id" | "offreur" | "demandeur">) : Promise<User> => {
     const { username, email, password, role } = user;
 
     // hash the password
@@ -30,6 +32,10 @@ export const createUser = async (user: Omit<User, "id">) : Promise<User> => {
             role,
             verificationToken
         },
+        include: {
+            demandeur: true,
+            offreur: true
+        }
     });
 
     // Create the verification link
@@ -52,6 +58,10 @@ export const getUserById = async (id: string): Promise<User | null> => {
     return await db.user.findUnique({
         where: {
             id,
+        },
+        include: {
+            offreur: true,
+            demandeur: true
         }
     })
 }
@@ -61,6 +71,10 @@ export const getUserByEmail = async (email: string): Promise<User | null> => {
     return await db.user.findUnique({
         where: {
             email,
+        },
+        include: {
+            offreur: true,
+            demandeur: true
         }
     })
 }

@@ -14,6 +14,7 @@ import { projetDemandeurRouter } from "./routes/project.demandeur.router";
 import { projetOffreurRouter } from "./routes/project.offreur.router";
 import { membresProjetRouter } from "./routes/membres.project.router";
 import { tachesRouter } from "./routes/taches.project.router";
+import { evaluationRouter } from "./routes/evaluation.router";
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ app.use(express.json());
 app.use('/api/auth', authRouter);
 app.use("/api/skills", skillRouter);
 app.use('/api/offreurs', offreurRouter);
+app.use('/api/offreurs', evaluationRouter);
 app.use('/api/offreur', experienceRouter);
 app.use('/api/demandeur', projetDemandeurRouter);
 app.use('/api/offreur', demandeOffreurRouter);
