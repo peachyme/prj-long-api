@@ -59,7 +59,8 @@ export const getProjet = async (id: number): Promise<Projet | null> => {
         include: {
             demandeur: true,
             demande: true,
-            membres: true
+            membres: true,
+            taches: true
         }
     });
 };

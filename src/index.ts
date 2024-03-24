@@ -13,6 +13,7 @@ import { paymentRouter } from "./routes/payment.router";
 import { projetDemandeurRouter } from "./routes/project.demandeur.router";
 import { projetOffreurRouter } from "./routes/project.offreur.router";
 import { membresProjetRouter } from "./routes/membres.project.router";
+import { tachesRouter } from "./routes/taches.project.router";
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.use('/api/demandeur', demandeDemandeurRouter);
 app.use('/api/demandeur', paymentRouter);
 app.use('/api/offreur', projetOffreurRouter);
 app.use('/api/projets', membresProjetRouter);
+app.use('/api/projet', tachesRouter);
 
 app.listen(PORT, () => {
     console.log(`App listening on port ${PORT}`);

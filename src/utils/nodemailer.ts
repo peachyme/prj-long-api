@@ -336,6 +336,8 @@ export const sendMembreProjetMail = (to: string, nom: string, prenom: string, fr
       nom,
       prenom,
       titre,
+      fromN,
+      fromP
     }
   
   };

@@ -50,7 +50,7 @@ membresProjetRouter.delete("/:id/removeMembre", isAuthenticated, isOffreur, isPr
             await MembresProjetController.removeMembre(projectId, membreId);    
         }        
         else {
-            return response.status(200).json({"message": "Offreur could not be found in the project"});
+            return response.status(404).json({"message": "Offreur could not be found in the project"});
         }
         return response.status(200).json({"message": "Offreur removed successfully"});
     } catch (error: any) {

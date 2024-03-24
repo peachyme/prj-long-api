@@ -138,7 +138,7 @@ offreurRouter.delete("/:id/deleteSkills", isAuthenticated, isOffreur, isProfileO
                 await OffreurController.deleteSkillFromOffreur(offreurId, skillId);    
             }        
             else {
-                return response.status(200).json({"message": "Skill could not be found in Offreur"});
+                return response.status(404).json({"message": "Skill could not be found in Offreur"});
             }
         }
         return response.status(200).json({"message": "Skills deleted successfully"});
